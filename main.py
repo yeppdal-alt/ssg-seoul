@@ -77,8 +77,8 @@ fig_risk.update_traces(textposition="outside")
 fig_risk.update_layout(yaxis=dict(title=None), height=720, coloraxis_showscale=False)
 st.plotly_chart(fig_risk, use_container_width=True)
 
-with st.expander("구별 레드오션 업종 상세 코멘트 보기"):
-    st.dataframe(risky_df.reset_index(drop=True), use_container_width=True)
+st.markdown("#### 구별 레드오션 업종 상세 코멘트")
+st.dataframe(risky_df.reset_index(drop=True), use_container_width=True)
 
 st.divider()
 

@@ -26,6 +26,63 @@ st.title("🏪 서울시 상가(상권) 정보 분석 대시보드")
 st.caption("데이터 출처: 소상공인시장진흥공단 상가(상권)정보 - 서울 (2026년 3월 기준)")
 
 # ────────────────────────────────────────────────────────────
+# 0. 구별 "여기서 창업하면 위험한" 대표 업종 (소분류 기준, 유머)
+# ────────────────────────────────────────────────────────────
+st.header("☠️ 구별 레드오션 주의보 — 여기서 창업하면 망할 수도 있어요")
+st.caption(
+    "※ 진지한 폐업률 예측이 아니라, 해당 구에서 '이미 제일 많이 몰려있는' 소분류 업종을 뽑아본 유머용 코너입니다. "
+    "경쟁이 세다는 뜻이지, 정말 망한다는 보장(?)은 아니니 참고만 해주세요 😅"
+)
+
+# 업종별 드립 코멘트 (없는 업종은 기본 코멘트로 대체)
+ROAST_COMMENTS = {
+    "백반/한정식": "골목마다 이미 이모님이 계십니다. '엄마 손맛'으로 뚫으려면 진짜 엄마급 실력이 필요해요.",
+    "경영 컨설팅업": "옆집도, 그 옆집도 전부 컨설팅펌... 다들 서로를 컨설팅해주는 걸까요?",
+    "변호사": "반경 100m 안에 변호사가 당신보다 많을 확률이 높습니다. 소장(訴狀)보다 명함이 더 많이 돌아다녀요.",
+    "부동산 중개/대리업": "매물보다 중개사가 더 많은 동네일지도 모릅니다. '급매'보다 '급창업'이 더 많아요.",
+    "입시·교과학원": "앞 학원, 옆 학원, 건너편 학원까지... 학생 쟁탈전에 오신 걸 환영합니다.",
+    "미용실": "커트 3천원 전쟁까지 각오해야 할지도? 손님보다 미용실 간판이 더 자주 보여요.",
+    "카페": "스타벅스, 투썸, 개인 카페가 골목 하나에 다 모여있는 곳일 가능성이 높습니다.",
+    "치킨": "국룰 창업 아이템의 최종 보스. 반경 500m 안에 이미 형제 치킨집이 있을지도 몰라요.",
+}
+DEFAULT_COMMENT = "이미 너무 많아서 사장님만 모르는 레드오션일 수도 있어요. 창업 전에 꼭 한 바퀴 둘러보세요."
+
+risky_rows = []
+for gu, sub in df.groupby("시군구명"):
+    vc = sub["상권업종소분류명"].value_counts()
+    top_cat, top_n = vc.idxmax(), vc.max()
+    pct = top_n / len(sub) * 100
+    risky_rows.append({
+        "구": gu,
+        "위험 업종(소분류)": top_cat,
+        "매장 수": top_n,
+        "구 전체 대비 비중(%)": round(pct, 1),
+        "한마디": ROAST_COMMENTS.get(top_cat, DEFAULT_COMMENT),
+    })
+risky_df = pd.DataFrame(risky_rows).sort_values("매장 수", ascending=False)
+
+worst = risky_df.iloc[0]
+st.warning(
+    f"🥇 오늘의 최고 위험 지역은 **{worst['구']}**의 **'{worst['위험 업종(소분류)']}'**! "
+    f"무려 **{worst['매장 수']:,}개**나 있어요 (구 전체 업소의 {worst['구 전체 대비 비중(%)']}%). {worst['한마디']}"
+)
+
+fig_risk = px.bar(
+    risky_df.sort_values("매장 수", ascending=True),
+    x="매장 수", y="구", orientation="h", text="위험 업종(소분류)",
+    color="매장 수", color_continuous_scale="Reds",
+    title="구별 대표 레드오션 업종 (막대 위 텍스트 = 업종명)",
+)
+fig_risk.update_traces(textposition="outside")
+fig_risk.update_layout(yaxis=dict(title=None), height=720, coloraxis_showscale=False)
+st.plotly_chart(fig_risk, use_container_width=True)
+
+with st.expander("구별 레드오션 업종 상세 코멘트 보기"):
+    st.dataframe(risky_df.reset_index(drop=True), use_container_width=True)
+
+st.divider()
+
+# ────────────────────────────────────────────────────────────
 # 1. 상단 고정 대시보드 - 강남구·서초구·마포구·용산구 업종(중분류) TOP10
 # ────────────────────────────────────────────────────────────
 st.header("📊 관심 4개 구 업종 TOP 10 (중분류)")

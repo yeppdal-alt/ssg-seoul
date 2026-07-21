@@ -54,14 +54,14 @@ gu_food = food.groupby("시군구명").size().reset_index(name="음식업소수"
 gu_total = df_all.groupby("시군구명").size().reset_index(name="전체업소수")
 gu_stat = gu_food.merge(gu_total, on="시군구명")
 gu_stat["음식업비중(%)"] = (gu_stat["음식업소수"] / gu_stat["전체업소수"] * 100).round(1)
-gu_stat["구분"] = gu_stat["시군구명"].apply(lambda x: "주요 4개 구" if x in TOP4_GU else "기타")
+gu_stat["구분"] = gu_stat["시군구명"].apply(lambda x: "관심 4개 구" if x in TOP4_GU else "기타")
 
 c1, c2 = st.columns(2)
 with c1:
     fig1 = px.bar(
         gu_stat.sort_values("음식업소수", ascending=True),
         x="음식업소수", y="시군구명", orientation="h", text="음식업소수",
-        color="구분", color_discrete_map={"주요 4개 구": "#e74c3c", "기타": "#3498db"},
+        color="구분", color_discrete_map={"관심 4개 구": "#e74c3c", "기타": "#3498db"},
         title="구별 음식업소 수",
     )
     fig1.update_traces(textposition="outside")
@@ -72,7 +72,7 @@ with c2:
     fig2 = px.bar(
         gu_stat.sort_values("음식업비중(%)", ascending=True),
         x="음식업비중(%)", y="시군구명", orientation="h", text="음식업비중(%)",
-        color="구분", color_discrete_map={"주요 4개 구": "#e74c3c", "기타": "#3498db"},
+        color="구분", color_discrete_map={"관심 4개 구": "#e74c3c", "기타": "#3498db"},
         title="구별 음식업 비중 (해당 구 전체 업종 대비 %)",
     )
     fig2.update_traces(textposition="outside")

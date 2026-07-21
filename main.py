@@ -7,7 +7,7 @@ import plotly.express as px
 # ────────────────────────────────────────────────────────────
 st.set_page_config(page_title="서울 상권 분석 대시보드", page_icon="🏪", layout="wide")
 
-DATA_PATH = "data.csv.gz"   # 같은 폴더에 이 파일을 함께 올려주세요.
+DATA_PATH = "data_seoul.csv"   # app.py와 같은 폴더에 이 파일을 함께 올려주세요.
 
 TOP4_GU = ["강남구", "서초구", "마포구", "용산구"]
 
@@ -169,7 +169,7 @@ else:
             st.caption("지도에는 표시 성능을 위해 최대 8,000개 업소를 무작위로 표시합니다.")
         fig5 = px.scatter_mapbox(
             map_df, lat="위도", lon="경도", color="상권업종대분류명",
-            hover_name="상호명", hover_data=["상권업종소분류명", "도로명주소"],
+            hover_name="상호명", hover_data=["상권업종소분류명"],
             zoom=11, height=550,
         )
         fig5.update_layout(mapbox_style="open-street-map", margin=dict(l=0, r=0, t=0, b=0))

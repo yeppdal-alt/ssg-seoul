@@ -26,18 +26,18 @@ st.title("🏪 서울시 상가(상권) 정보 분석 대시보드")
 st.caption("데이터 출처: 소상공인시장진흥공단 상가(상권)정보 - 서울 (2026년 3월 기준)")
 
 # ────────────────────────────────────────────────────────────
-# 1. 상단 고정 대시보드 - 강남구·서초구·마포구·용산구 업종 TOP5
+# 1. 상단 고정 대시보드 - 강남구·서초구·마포구·용산구 업종(중분류) TOP10
 # ────────────────────────────────────────────────────────────
-st.header("📊 주요 4개 구 업종 TOP 5")
+st.header("📊 주요 4개 구 업종 TOP 10 (중분류)")
 
 cols = st.columns(4)
 for col, gu in zip(cols, TOP4_GU):
     sub = df[df["시군구명"] == gu]
-    top5 = sub["상권업종대분류명"].value_counts().head(5).reset_index()
-    top5.columns = ["업종", "개수"]
+    top10 = sub["상권업종중분류명"].value_counts().head(10).reset_index()
+    top10.columns = ["업종", "개수"]
 
     fig = px.bar(
-        top5, x="개수", y="업종", orientation="h", text="개수",
+        top10, x="개수", y="업종", orientation="h", text="개수",
         title=f"{gu} ({len(sub):,}개 업소)",
         color="개수", color_continuous_scale="Blues",
     )
@@ -45,7 +45,7 @@ for col, gu in zip(cols, TOP4_GU):
     fig.update_layout(
         yaxis=dict(autorange="reversed", title=None),
         xaxis=dict(title=None),
-        height=320, margin=dict(l=10, r=10, t=40, b=10),
+        height=430, margin=dict(l=10, r=10, t=40, b=10),
         coloraxis_showscale=False,
         title_font_size=14,
     )
